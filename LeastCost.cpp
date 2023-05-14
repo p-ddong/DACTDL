@@ -14,16 +14,17 @@ struct MT // ma trận bài toán vận tải
     int a[MAX];// các điểm cung
     int b[MAX];// các điểm cầu
     int c[MAX][MAX];// cước phí
-    int x[MAX][MAX];// lượng hàng cần vận chuyển
+    int x[MAX][MAX]={0};// ma trận chuyển hàng
 };
-
 class LeastCost{
     struct MT *mtr1;
 public:
     void ThietLapMT(MT *mtr1);
-
+    void Chiahang(MT *mtr1);
+    void TongCuocPhi(MT mtr1);
+    void Hienthi(MT mtr1);
 };
-
+//ThietLapMT sẽ làm nhiệm vụ nhập dữ liệu và cân bằng cung cầu
 void LeastCost::ThietLapMT(MT *mtr1){
     int cung = 0;
     int cau = 0;
@@ -60,8 +61,6 @@ void LeastCost::ThietLapMT(MT *mtr1){
         sosanh = 1;
     } else if (cung < cau){
         sosanh = 2;
-    } else {
-        return; // nếu không có hàng cần vận chuyển hoặc hàng cần nhận thì thoát khỏi hàm
     }
     int count = abs(cung-cau);
     switch(sosanh){
@@ -80,7 +79,7 @@ void LeastCost::ThietLapMT(MT *mtr1){
                     mtr1->c[i][j] = c2[i][j];
                 }
             }
-            mtr1->b[mtr1->n-1]=count   
+            mtr1->b[mtr1->n-1]=count; 
             break;
         case 2:
             mtr1->m = mtr1->m + 1;
@@ -88,26 +87,45 @@ void LeastCost::ThietLapMT(MT *mtr1){
             for (int i = 0; i < mtr1->m-1; i++) {
                 for (int j = 0; j < mtr1->n; j++) {
                     c2[i][j] = mtr1->c[i][j];
-                }
-            }
+                };
+            };
             for (int j = 0; j < mtr1->n; j++) {
                 c2[mtr1->m-1][j] = 0;
-            }
+            };
             // gán ma trận mới thiết lập vào ma trận cũ
             for (int i = 0; i < mtr1->m; i++) {
                 for (int j = 0; j < mtr1->n; j++) {
                     mtr1->c[i][j] = c2[i][j];
-                }
-            }
-            mtr1->a[mtr1->m-1]=count 
+                };
+            };
+            mtr1->a[mtr1->m-1]=count; 
             break;
         default:
             break;
+            
     } 
 }
+//ChiaHang sẽ làm nhiệm vụ chia hàng từ cung tới cầu 
+void LeastCost::Chiahang(MT *mtr1)
+{
+ 
+}
+
+void LeastCost::TongCuocPhi(MT mtr1)
+{
+
+}
+
+void LeastCost::Hienthi(MT mtr1)
+{
+
+}
+
 int main() {
     MT mtr;
     LeastCost lc;
     lc.ThietLapMT(&mtr);
     return 0;
 }
+
+
