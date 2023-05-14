@@ -32,7 +32,8 @@ void LeastCost::ThietLapMT(MT *mtr1){
     cin >> mtr1->m;
     cout<<" Số trạm nhận hàng : ";
     cin >> mtr1->n;
-     for (int i = 0; i < mtr1->m; i++) {
+    int c2[MAX][MAX]; // khai báo ma trận mới c2 để lưu trữ ma trận cũ và thêm hàng hoặc cột mới
+    for (int i = 0; i < mtr1->m; i++) {
         cout << "Nhập cước phí hàng " << i+1 << " : ";
         for (int j = 0; j < mtr1->n; j++) {
             int value;
@@ -40,70 +41,70 @@ void LeastCost::ThietLapMT(MT *mtr1){
             mtr1->c[i][j] = value;
         };
     };
-cout<<"Nhập số hàng cần vận chuyển :"<<endl;
-  for (int i = 0; i <  mtr1->m; i++) {
+    
+    cout<<"Nhập số hàng cần vận chuyển :"<<endl;
+    for (int i = 0; i <  mtr1->m; i++) {
         cout << "Trạm cung " << i+1 << ": ";
         cin >> mtr1->a[i];
-        cung = cung+a[i];
+        cung = cung + mtr1->a[i];
     };
-cout<<"Nhập số hàng cần nhận :"<<endl;
-  for (int i = 0; i <  mtr1->n; i++) {
+    
+    cout<<"Nhập số hàng cần nhận :"<<endl;
+    for (int i = 0; i <  mtr1->n; i++) {
         cout << "Trạm cầu " << i+1 << ": ";
         cin >> mtr1->b[i];
-        cau = cau + b[i]
+        cau = cau + mtr1->b[i];
     }; 
+    
     if (cung > cau){
         sosanh = 1;
-    };
-    if (cung < cau){
+    } else if (cung < cau){
         sosanh = 2;
-    }; 
-   switch(sosanh){
-    case 1:
-        int count;
-        int c2[mtr1->m][mtr1->n]; // tạo ma trận mới c2 để lưu trữ ma trận cũ và thêm cột mới
-        for (int i = 0; i < mtr1->m; i++) {
-            for (int j = 0; j < mtr1->n-1; j++) {
-                c2[i][j] = mtr1->c[i][j];
-            };
-        };
-        //gán giá trị 0 cho cột mới
-        mtr1->n = mtr1->n + 1;       
-        for (int i = 0; i < mtr1->m; i++) {
-            c2[i][mtr1->n] = 0;
-        };
-        //gán ma trận mới thiết lập vào ma trận cũ 
-        for (int i = 0; i < mtr1->m; i++) {
+    } else {
+        return; // nếu không có hàng cần vận chuyển hoặc hàng cần nhận thì thoát khỏi hàm
+    }
+    int count = abs(cung-cau);
+    switch(sosanh){
+        case 1:
+            mtr1->n = mtr1->n + 1;
+            // sao chép ma trận cũ sang ma trận mới c2 và thêm cột mới
+            for (int i = 0; i < mtr1->m; i++) {
+                for (int j = 0; j < mtr1->n-1; j++) {
+                    c2[i][j] = mtr1->c[i][j];
+                }
+                c2[i][mtr1->n-1] = 0;
+            }
+            // gán ma trận mới thiết lập vào ma trận cũ 
+            for (int i = 0; i < mtr1->m; i++) {
+                for (int j = 0; j < mtr1->n; j++) {
+                    mtr1->c[i][j] = c2[i][j];
+                }
+            }
+            mtr1->b[mtr1->n-1]=count   
+            break;
+        case 2:
+            mtr1->m = mtr1->m + 1;
+            // sao chép ma trận cũ sang ma trận mới c2 và thêm hàng mới
+            for (int i = 0; i < mtr1->m-1; i++) {
+                for (int j = 0; j < mtr1->n; j++) {
+                    c2[i][j] = mtr1->c[i][j];
+                }
+            }
             for (int j = 0; j < mtr1->n; j++) {
-        mtr1->c[i][j] = c2[i][j];
-            };
-        };   
-        break;
-    case 2:
-     int count;
-        mtr1->m = mtr1->m + 1;
-        int c2[mtr1->m][mtr1->n]; // tạo ma trận mới c2 để lưu trữ ma trận cũ và thêm hàng mới
-        for (int i = 0; i < mtr1->m-1; i++) {
-            for (int j = 0; j < mtr1->n; j++) {
-                c2[i][j] = mtr1->c[i][j];
-            };
-        };
-        //gán giá trị 0 cho hàng mới               
-        for (int i = 0; i < mtr1->n; i++) { 
-            c2[mtr1->n][i] = 0;
-        };
-        //gán ma trận mới thiết lập vào ma trận cũ
-        for (int i = 0; i < mtr1->m; i++) {
-            for (int j = 0; j < mtr1->n; j++) {
-        mtr1->c[i][j] = c2[i][j];
-            };
-        };
-        break;
-    default:
-        break;
-   } 
+                c2[mtr1->m-1][j] = 0;
+            }
+            // gán ma trận mới thiết lập vào ma trận cũ
+            for (int i = 0; i < mtr1->m; i++) {
+                for (int j = 0; j < mtr1->n; j++) {
+                    mtr1->c[i][j] = c2[i][j];
+                }
+            }
+            mtr1->a[mtr1->m-1]=count 
+            break;
+        default:
+            break;
+    } 
 }
-
 int main() {
     MT mtr;
     LeastCost lc;
