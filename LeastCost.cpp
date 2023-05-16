@@ -20,7 +20,7 @@ struct MT // ma trận bài toán vận tải
     int tongcau=0;// tổng số hàng cầu
 };
 class LeastCost{
-    struct MT *mtr1;
+    struct MT mtr1;
 public:
     void ThietLapMT(MT *mtr1);
     void Chiahang(MT *mtr1);
@@ -108,76 +108,67 @@ void LeastCost::ThietLapMT(MT *mtr1){
     } 
 }
 //ChiaHang sẽ làm nhiệm vụ chia hàng từ cung tới cầu 
-void LeastCost::Chiahang(MT *mtr1)
-{
-struct MT *mtr2 = mtr1;
-int smallest = 1000; // khởi tạo giá trị nhỏ nhất cho biến smallest
-while(mtr2->tongcung != 0 || mtr2->tongcau !=0){
-    int m,n;
-    for(int i=0; i<mtr2->m; i++) {
-        for(int j=0; j<mtr2->n; j++) {
-            if(mtr2->c[i][j] != 0 && mtr2->c[i][j] < smallest) { // nếu phần tử khác 0 và nhỏ hơn smallest
-                smallest = mtr2->c[i][j];
-                m=i-1;
-                n=j-1;
+void LeastCost::Chiahang(MT *mtr1) {
+    struct MT mtr2 = *mtr1;
+    while(true) {
+        int m = -1, n = -1;
+        int smallest = 100; // khởi tạo giá trị nhỏ nhất cho biến smallest
+        for(int i=0; i<mtr2.m; i++) {
+            for(int j=0; j<mtr2.n; j++) {
+                if(mtr2.c[i][j] != 0 && mtr2.c[i][j] < smallest) { // nếu phần tử khác 0 và nhỏ hơn smallest
+                    smallest = mtr2.c[i][j];
+                    m=i;
+                    n=j;
+                }
+            }
+        }
+        if (m==-1 || n==-1) {
+            break;
+        }
+        if(mtr2.a[m] == 0 || mtr2.b[n] == 0 ) {
+            mtr2.c[m][n]=0;
+        } else if (mtr2.a[m]>mtr2.b[n]) {
+            mtr2.x[m][n]=mtr2.b[n];
+            mtr2.tongcung=mtr2.tongcung-mtr2.a[m]; 
+            mtr2.tongcau=mtr2.tongcau-mtr2.b[n];
+            mtr2.a[m]=mtr2.a[m]-mtr2.b[n];
+            mtr2.b[n]=0;
+            mtr2.c[m][n]=0;
+        } else if(mtr2.a[m]<mtr2.b[n]) {
+            mtr2.x[m][n]=mtr2.a[m];
+            mtr2.tongcung=mtr2.tongcung-mtr2.a[m]; 
+            mtr2.tongcau=mtr2.tongcau-mtr2.b[n];
+            mtr2.b[n]=mtr2.b[n]-mtr2.a[m];
+            mtr2.a[m]=0;
+            mtr2.c[m][n]=0;
+        } else if (mtr2.a[m]==mtr2.b[n]) {
+            mtr2.x[m][n]=mtr2.a[m];
+            mtr2.tongcung=mtr2.tongcung-mtr2.a[m]; 
+            mtr2.tongcau=mtr2.tongcau-mtr2.b[n];
+            mtr2.a[m]=0;
+            mtr2.b[n]=0;
+            mtr2.c[m][n]=0;
+        }
+        if (mtr2.tongcung == 0 && mtr2.tongcau == 0) {
+            return;
+        } else if ( mtr2.tongcung == 0 && mtr2.tongcau != 0) {
+            for ( int i = 0; i < mtr2.n; i++) {
+                mtr2.x[mtr2.m-1][i]=mtr2.b[i];
+                mtr2.b[i]=0;  
+            }
+        } else if (mtr2.tongcung != 0 && mtr2.tongcau == 0) {
+            for ( int i = 0; i < mtr2.m; i++) {
+                mtr2.x[i][mtr2.n-1]=mtr2.a[i];
+                mtr2.a[i]=0;  
             }
         }
     }
-if(mtr2->a[m] == 0 || mtr2->b[n] == 0 ){
-    mtr2->c[m][n]=0;
-}else if (mtr2->a[m]>mtr2->b[n]){
-    mtr2->x[m][n]=mtr2->b[n];
-    mtr2->tongcung=mtr2->tongcung-mtr2->a[m]; 
-    mtr2->tongcau=mtr2->tongcau-mtr2->b[n];
-    mtr2->a[m]=mtr2->a[m]-mtr2->b[n];
-    mtr2->b[n]=0;
-    mtr2->c[m][n]=0;
-    return;
-}else if(mtr2->a[m]<mtr2->b[n]){
-    mtr2->x[m][n]=mtr2->a[m];
-    mtr2->tongcung=mtr2->tongcung-mtr2->a[m]; 
-    mtr2->tongcau=mtr2->tongcau-mtr2->b[n];
-    mtr2->b[n]=mtr2->b[n]-mtr2->a[m];
-    mtr2->a[m]=0;
-    mtr2->c[m][n]=0;
-    return;
-}else if (mtr2->a[m]==mtr2->b[n]){
-    mtr2->x[m][n]=mtr2->a[m];
-    mtr2->tongcung=mtr2->tongcung-mtr2->a[m]; 
-    mtr2->tongcau=mtr2->tongcau-mtr2->b[n];
-    mtr2->a[m]=0;
-    mtr2->b[n]=0;
-    mtr2->c[m][n]=0;
-    return;
-}else {
-    return;
-};
-
-}
-if (mtr2->tongcung == 0 && mtr2->tongcau == 0){
-    return;
-}else if ( mtr2->tongcung == 0 && mtr2->tongcau != 0){
-for ( int i = 0; i < mtr2->n; i++)
-{
-  mtr2->x[mtr2->m-1][i]=mtr2->b[i];
-  mtr2->b[i]=0;  
-}
-return;
-}else if (mtr2->tongcung != 0 && mtr2->tongcau == 0){
-    for ( int i = 0; i < mtr2->m; i++)
-{
-  mtr2->x[i][mtr2->n-1]=mtr2->a[i];
-  mtr2->a[i]=0;  
-}
-return;
-}else{ 
-return;
-}
-for (int i = 0; i < mtr1->m; i++) {
-                for (int j = 0; j < mtr1->n; j++) {
-                    mtr1->x[i][j] = mtr2->x[i][j];
-                };
-};
+    //chuyển ma trận chuyển hàng từ mtr2 sang mtr1 
+    for (int i = 0; i < mtr1->m; i++) {
+        for (int j = 0; j < mtr1->n; j++) {
+            mtr1->x[i][j] = mtr2.x[i][j];
+        }
+    }
 }
 
 void LeastCost::TongCuocPhi(MT mtr1)
@@ -194,29 +185,30 @@ void LeastCost::TongCuocPhi(MT mtr1)
 }
 void LeastCost::Hienthi(MT mtr1)
 {
-    cout << "Ma tran van tai:\n";
-    cout << "cung/cau ";
+    cout << "Ma Trận cước phí:"<<endl;
+    cout << "Cung/Cầu ";
     for (int j = 0; j < mtr1.n; j++) {
-        cout << "b" << j+1 << " ";
+        cout <<"("<<mtr1.b[j]<<") ";
     }
     cout << endl;
+
     for (int i = 0; i < mtr1.m; i++) {
-        cout << "a" << i+1 << "      ";
+        cout <<"("<<mtr1.a[i]<<")    ";
         for (int j = 0; j < mtr1.n; j++) {
-            cout << mtr1.c[i][j] << " ";
+            cout << mtr1.c[i][j] <<"  ";
         }
         cout << endl;
     }
-    cout << "\nMa tran phan bo:\n";
+    cout << "Ma trận chuyển hàng:"<<endl;
     cout << "cung/cau ";
     for (int j = 0; j < mtr1.n; j++) {
-        cout << "b" << j+1 << " ";
+        cout <<"("<< mtr1.b[j]<<") ";
     }
     cout << endl;
     for (int i = 0; i < mtr1.m; i++) {
-        cout << "a" << i+1 << "      ";
+        cout << mtr1.a[i] << "      ";
         for (int j = 0; j < mtr1.n; j++) {
-            cout << mtr1.a[i*mtr1.n+j] << " ";
+            cout << mtr1.x[i][j] << " ";
         }
         cout << endl;
     }
@@ -230,6 +222,5 @@ int main() {
     lc.TongCuocPhi(mtr);
     return 0;
 }
-
 
 
