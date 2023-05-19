@@ -4,9 +4,10 @@
 #include<iomanip>
 #include<stdlib.h>
 #include<cmath>
+#include <fstream>
+#include <vector>
 #define MAX 50
 using namespace std;
-
 struct MT // ma trận bài toán vận tải
 {
     int m;// số trạm cung
@@ -26,14 +27,24 @@ public:
     void Chiahang(MT *mtr1);
     void TongCuocPhi(MT mtr1);
     void Hienthi(MT mtr1);
+    friend void DonHinh(MT *mtr1);
+    friend void GocTayBac(MT &mtr1);
+    friend bool CheckMang(int arr[MAX],int n);
 };
 //ThietLapMT sẽ làm nhiệm vụ nhập dữ liệu và cân bằng cung cầu
 void LeastCost::ThietLapMT(MT *mtr1){
+    int c2[MAX][MAX]; // khai báo ma trận mới c2 để lưu trữ ma trận cũ và thêm hàng hoặc cột mới
+    fstream file;
+    string filename = "data.txt";   
+    // Mở file để đọc dữ liệu
+    file.open(filename, ios::in);
+    // Kiểm tra xem file có tồn tại không
+    if (!file) {
+    cout << "Khong the mo file!" << endl;
     cout<<" Số trạm cung ứng : ";
     cin >> mtr1->m;
     cout<<" Số trạm nhận hàng : ";
     cin >> mtr1->n;
-    int c2[MAX][MAX]; // khai báo ma trận mới c2 để lưu trữ ma trận cũ và thêm hàng hoặc cột mới
     for (int i = 0; i < mtr1->m; i++) {
         cout << "Nhập cước phí hàng " << i+1 << " : ";
         for (int j = 0; j < mtr1->n; j++) {
@@ -55,7 +66,28 @@ void LeastCost::ThietLapMT(MT *mtr1){
         cout << "Trạm cầu " << i+1 << ": ";
         cin >> mtr1->b[i];
         mtr1->tongcau = mtr1->tongcau + mtr1->b[i];
+        return ;
+    };
+    }
+    // Đọc dữ liệu từ file
+        file >> mtr1->m;
+        file >> mtr1->n;
+        for(int i=0; i<mtr1->m;i++){
+            for(int j = 0; j < mtr1->n; j++){
+                int value;
+                file >> value;
+                mtr1->c[i][j]=value;
+            }
+        }
+        for (int i = 0; i <  mtr1->m; i++) {
+        file >> mtr1->a[i];
+       mtr1->tongcung = mtr1->tongcung + mtr1->a[i];
+    }
+    for (int i = 0; i <  mtr1->n; i++) {
+        file >> mtr1->b[i];
+        mtr1->tongcau = mtr1->tongcau + mtr1->b[i];
     }; 
+    file.close();
     // cân bằng cung cầu
     if (mtr1->tongcung > mtr1->tongcau){
         mtr1->value = 1;
@@ -112,11 +144,12 @@ void LeastCost::Chiahang(MT *mtr1) {
     struct MT mtr2 = *mtr1;
     while(true) {
         int m = -1, n = -1;
-        int smallest = 100; // khởi tạo giá trị nhỏ nhất cho biến smallest
+        int smallest = 100; 
         for(int i=0; i<mtr2.m; i++) {
             for(int j=0; j<mtr2.n; j++) {
-                if(mtr2.c[i][j] != 0 && mtr2.c[i][j] < smallest) { // nếu phần tử khác 0 và nhỏ hơn smallest
+                if(mtr2.c[i][j] != 0 && mtr2.c[i][j] < smallest) {
                     smallest = mtr2.c[i][j];
+                    // lấy vị trí của cước phí nhỏ nhất
                     m=i;
                     n=j;
                 }
@@ -149,7 +182,9 @@ void LeastCost::Chiahang(MT *mtr1) {
             mtr2.b[n]=0;
             mtr2.c[m][n]=0;
         }
-        if (mtr2.tongcung == 0 && mtr2.tongcau == 0) {
+        
+    }
+    if (mtr2.tongcung == 0 && mtr2.tongcau == 0) {
             return;
         } else if ( mtr2.tongcung == 0 && mtr2.tongcau != 0) {
             for ( int i = 0; i < mtr2.n; i++) {
@@ -162,7 +197,6 @@ void LeastCost::Chiahang(MT *mtr1) {
                 mtr2.a[i]=0;  
             }
         }
-    }
     //chuyển ma trận chuyển hàng từ mtr2 sang mtr1 
     for (int i = 0; i < mtr1->m; i++) {
         for (int j = 0; j < mtr1->n; j++) {
@@ -170,7 +204,6 @@ void LeastCost::Chiahang(MT *mtr1) {
         }
     }
 }
-
 void LeastCost::TongCuocPhi(MT mtr1)
 {
     int tongcp = 0;
@@ -213,13 +246,149 @@ void LeastCost::Hienthi(MT mtr1)
         cout << endl;
     }
 }
+void GocTayBac(MT &mtr1)
+{
+    struct MT mtr2 = mtr1;
+    int i = 0; 
+    int j = 0;
+while (true){   
+    
+    if (mtr2.a[i]<mtr2.b[j]){
+    mtr2.x[i][j]= mtr2.a[i];
+    mtr2.b[j]=abs(mtr2.a[i]-mtr2.b[j]);
+    mtr2.a[i]=0;
+    i = i+1;
+    }
+    if (mtr2.a[i]>mtr2.b[j]){
+    mtr2.x[i][j]=mtr2.b[j];
+    mtr2.a[i]=abs(mtr2.a[i]-mtr2.b[j]);
+    mtr2.b[j]=0;
+    j = j+1;
+    }
+    if(mtr2.a[i]==mtr2.b[j]){
+    mtr2.x[i][j]=mtr2.a[i];
+    mtr2.b[j]=0;
+    mtr2.a[i]=0;
+    i = i+1;
+    j = j+1;
+    }
+if (i==mtr1.m && j==mtr1.n ){
+     break;
+}
+}
+for (int i = 0; i < mtr1.m; i++) {
+        for (int j = 0; j < mtr1.n; j++) {
+            mtr1.x[i][j] = mtr2.x[i][j];
+        }
+    }
+}
+bool CheckMang(int Arr[MAX], int n) {
+    int count=0;
+    for (int i = 0; i < n+1; i++) {
+        if (Arr[i] != 0) {
+            count = count + 1;
+        }
+    }
+    if(count==n){
+    return true;
+    }
+    else{
+        return false;
+    }
+}
+bool AskToContinue() {
+    char choice;
+    while (true) {
+        cout << "Bài toán chưa tối ưu bạn có muốn tiếp tục ? (y/n): ";
+        cin >> choice;
+        if (choice == 'y' || choice == 'Y') {
+            return true;
+        } else if (choice == 'n' || choice == 'N') {
+            return false;
+        } else {
+            cout << "Nhập sai." << endl;
+        }
+    }
+}
+void DonHinh(MT *mtr1)
+{
+// tính số thế vị
+int u[MAX]={0};
+int v[MAX]={0};
+while(true){
+    for(int i=0; i<mtr1->m;i++){
+        for(int j=0; j<mtr1->n;j++){
+            if(mtr1->x[i][j]!=0){
+            if(u[i]==0 && i !=0 && v[j]!=0){
+                u[i]=mtr1->c[i][j]-v[j];
+            }
+            if(v[j]==0 && u[i] == 0 && i == 0 ){              
+                v[j]=mtr1->c[i][j]-u[i];
+                }else if (v[j]==0 && u[i] !=0 && i!=0){               
+                v[j]=mtr1->c[i][j]-u[i];
+                }
+                }
+            }
+            }
+    int count=0;
+    for (int i = 0; i < mtr1->n; i++) {
+        if (v[i] != 0) {
+            count = count + 1;
+        }
+    }
+    if(count==mtr1->n){
+        break;
+    }            
+}
+for(int i=0; i<mtr1->m;i++){
+            cout<<"u["<<i<<"] :"<<u[i]<<endl;
+       }
+for(int j=0; j<mtr1->n;j++){             
+            cout<<"v["<<j<<"] :"<<v[j]<<endl;
+         }
+//tính số kiểm tra 
+int biggest=0;
+int m,n,a=0;
+int delta[MAX][MAX];
+    for(int i=0; i<mtr1->m;i++){
+        for(int j=0; j<mtr1->n;j++){
+            delta[i][j]=u[i]+v[j]-mtr1->c[i][j];
+            cout<<"delta["<<i<<"]["<<j<<"]:"<<delta[i][j]<<endl;
+        }
+    }
+   for(int i=0; i<mtr1->m;i++){
+        for(int j=0; j<mtr1->n;j++){
+            if (delta[i][j]>0){
+                cout<<"Bài toán chưa tối ưu"<<endl;
+                a=a+1;
+                if (delta[i][j]>0 && delta[i][j]>biggest){
+                delta[i][j]=biggest;
+                //lấy vị trí có delta dương lớn nhất
+                i=m;
+                j=n;
+                }
+            }
+        }
+    }
+if (a>0)
+    if(AskToContinue()){
+        
+    }
+}
 int main() {
-    MT mtr;
-    LeastCost lc;
+    MT mtr,mtr3;
+    LeastCost lc; 
     lc.ThietLapMT(&mtr);
+    mtr3 = mtr;
     lc.Chiahang(&mtr);
+    //GocTayBac(&mtr3);
+    //cout<<"Phương Pháp LeastCost :"<<endl;
     lc.Hienthi(mtr);
     lc.TongCuocPhi(mtr);
+    //cout<<"Phương Pháp North-West Corner :"<<endl;
+    //lc.Hienthi(mtr3);
+    //lc.TongCuocPhi(mtr3);
+    DonHinh(&mtr);
     return 0;
 }
 
