@@ -17,25 +17,6 @@ struct MT // ma trận bài toán vận tải
     int c[MAX][MAX];// cước phí
     int x[MAX][MAX]={0};// ma trận chuyển hàng
     int value=0;// mức độ ưu tiên
-    #include<iostream>
-#include<stdio.h>
-#include<conio.h>
-#include<iomanip>
-#include<stdlib.h>
-#include<cmath>
-#include <fstream>
-#include <vector>
-#define MAX 50
-using namespace std;
-struct MT // ma trận bài toán vận tải
-{
-    int m;// số trạm cung
-    int n;// số trạm cầu
-    int a[MAX];// các điểm cung
-    int b[MAX];// các điểm cầu
-    int c[MAX][MAX];// cước phí
-    int x[MAX][MAX]={0};// ma trận chuyển hàng
-    int value=0;// mức độ ưu tiên
     int tongcung=0;// tổng số hàng cung
     int tongcau=0;// tổng số hàng cầu
 };
